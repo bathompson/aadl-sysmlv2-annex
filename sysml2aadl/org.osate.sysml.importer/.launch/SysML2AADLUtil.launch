@@ -16,7 +16,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.osate.sysml2aadl.SysML2AADLUtil"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="org.osate.sysml.importer"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-a ${workspace_loc:/aadl.library}&#10;-s &quot;${workspace_loc:/SysML-v2-Pilot-Implementation/sysml.library/Domain Libraries/Quantities and Units/SI.sysml}&quot;&#10;-o ${workspace_loc:/aadl}/examples/output&#10;-v&#10;${workspace_loc:/aadl}/examples/Subcomponents.sysml"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-a C:\Users\e40081898\Documents\SysML-Agree-example\aadl.library&#13;&#10;-s C:\Users\e40081898\.sysml-2ls\sysml.library&#13;&#10;-o C:\Users\e40081898\Documents\SysML-Agree-example\&#13;&#10;-v&#13;&#10;C:\Users\e40081898\Documents\SysML-Agree-example\Integer_Toy.sysml"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.osate.sysml.importer"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=file:/home/lwrage/git/mbe/aadl-sysml2/sysml2aadl/org.osate.sysml.importer/src/org/osate/sysml2aadl/log4j.properties"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=file:C:\Users\e40081898\Documents\osate_git\aadl-sysmlv2\sysml2aadl\org.osate.sysml.importer\src\org\osate\sysml2aadl\log4j.properties"/>
 </launchConfiguration>

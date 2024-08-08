@@ -23,6 +23,7 @@
 package org.osate.sysml2aadl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -54,6 +56,7 @@ import org.omg.sysml.lang.sysml.ConnectorAsUsage;
 import org.omg.sysml.lang.sysml.Element;
 import org.omg.sysml.lang.sysml.FeatureDirectionKind;
 import org.omg.sysml.lang.sysml.FeatureReferenceExpression;
+import org.omg.sysml.lang.sysml.FeatureTyping;
 import org.omg.sysml.lang.sysml.ItemUsage;
 import org.omg.sysml.lang.sysml.LiteralInteger;
 import org.omg.sysml.lang.sysml.Namespace;
@@ -64,6 +67,8 @@ import org.omg.sysml.lang.sysml.PartUsage;
 import org.omg.sysml.lang.sysml.PortDefinition;
 import org.omg.sysml.lang.sysml.PortUsage;
 import org.omg.sysml.lang.sysml.Relationship;
+import org.omg.sysml.lang.sysml.TextualRepresentation;
+import org.omg.sysml.lang.sysml.Comment;
 import org.omg.sysml.lang.sysml.Type;
 import org.omg.sysml.util.FeatureUtil;
 import org.osate.aadl2.Aadl2Factory;
@@ -82,10 +87,13 @@ import org.osate.aadl2.ConnectionEnd;
 import org.osate.aadl2.ContainedNamedElement;
 import org.osate.aadl2.ContainmentPathElement;
 import org.osate.aadl2.Context;
+import org.osate.aadl2.DataPort;
 import org.osate.aadl2.DirectedFeature;
+import org.osate.aadl2.EventDataPort;
 import org.osate.aadl2.Feature;
 import org.osate.aadl2.IntegerLiteral;
 import org.osate.aadl2.ListValue;
+import org.osate.aadl2.ModelUnit;
 import org.osate.aadl2.NamedElement;
 import org.osate.aadl2.NumberType;
 import org.osate.aadl2.PackageSection;
@@ -99,6 +107,7 @@ import org.osate.aadl2.UnitLiteral;
 import org.osate.aadl2.UnitsType;
 import org.osate.aadl2.modelsupport.scoping.Aadl2GlobalScopeUtil;
 import org.osate.sysml.util.ProxyUtil;
+import org.osate.aadl2.DataSubcomponentType;
 
 /**
  * This class contains the functionality to convert EMF resources for SysML files
@@ -265,14 +274,18 @@ public class SysML2AADLConverter {
 		res.getContents().add(ap);
 		ap.setName(sp.getQualifiedName());
 		res.setID(ap, sp.getElementId());
-
+		ModelUnit mu = new DummyModelUnit();
+		mu.setName("Base_Types");
 		var pub = ap.createOwnedPublicSection();
+		pub.getImportedUnits().add(mu);
 
 		for (var m : sp.getOwnedMember()) {
 			if (m instanceof PartDefinition pd) {
 				convertPartDefinition(res, pub, pd);
 			} else if (m instanceof Package p) {
 				convertPackage(p);
+			} else if (m instanceof TextualRepresentation tr) {
+				convertTextualRepresentation(res, pub, tr);
 			}
 		}
 	}
@@ -296,6 +309,9 @@ public class SysML2AADLConverter {
 					for (var m : pd.getOwnedMember()) {
 						if (m instanceof PortUsage p) {
 							convertPortUsage(res, ctype, p);
+						}
+						if (m instanceof TextualRepresentation tr) {
+							convertTextualRepresentation(res, ctype, tr);
 						}
 					}
 					for (var f : pd.getOwnedFeature()) {
@@ -321,6 +337,11 @@ public class SysML2AADLConverter {
 							convertAttributeUsage(res, cimpl, a);
 						}
 					}
+					for(var m : pd.getOwnedMember()) {
+						if (m instanceof TextualRepresentation tr) {
+							convertTextualRepresentation(res, cimpl, tr);
+						}
+					}
 				}
 			} else {
 				logger.error("cannot create AADL classifier for " + pd.getQualifiedName());
@@ -328,6 +349,18 @@ public class SysML2AADLConverter {
 		} else {
 			logger.warn("skipping part definition " + pd.getQualifiedName());
 		}
+	}
+
+	private void convertTextualRepresentation(XMLResource res, ComponentClassifier cc, TextualRepresentation tr) {
+		org.osate.aadl2.DefaultAnnexSubclause destAnnex = cc.createOwnedAnnexSubclause();
+		destAnnex.setName(tr.getLanguage());
+		destAnnex.setSourceText("{**"+tr.getBody()+"**}");
+	}
+	
+	private void convertTextualRepresentation(XMLResource res, PackageSection ps, TextualRepresentation tr) {
+		org.osate.aadl2.DefaultAnnexLibrary destAnnex = (org.osate.aadl2.DefaultAnnexLibrary)ps.createOwnedAnnexLibrary(Aadl2Package.eINSTANCE.getDefaultAnnexLibrary());
+		destAnnex.setName(tr.getLanguage());
+		destAnnex.setSourceText("{**"+tr.getBody()+"**}");
 	}
 
 	/**
@@ -340,6 +373,26 @@ public class SysML2AADLConverter {
 		port.getPortDefinition().stream().filter(pd -> pd.specializesFromLibrary("AADL::Feature")).findFirst()
 				.ifPresent(pd -> {
 					var f = createFeature(res, port, pd);
+					if(f instanceof DataPort dp)
+					{
+//						var features = pd.getFeature();
+//						for(var feature : features)
+//						{
+//							if(feature instanceof ItemUsage iu)
+//							{
+//								System.out.println(iu);
+//								var types = iu.getType();
+//								for(var t : types);
+//							}
+//						}
+						DataSubcomponentType dst = new DummyDataSubcomponentType();
+						dst.setName("Base_Types::Integer");
+						dp.setDataFeatureClassifier(dst);
+					} else if(f instanceof EventDataPort edp) {
+						DataSubcomponentType dst = new DummyDataSubcomponentType();
+						dst.setName("Base_Types::Integer");
+						edp.setDataFeatureClassifier(dst);
+					}
 					if (f != null) {
 						logger.info("converting port usage " + port.getQualifiedName());
 						if (addFeature(ctype, f)) {
@@ -599,7 +652,7 @@ public class SysML2AADLConverter {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Create an AADL feature from a SysML port.
 	 * @param res the resource containing the generated AADL model
@@ -625,6 +678,11 @@ public class SysML2AADLConverter {
 				}
 				p.getUsage().stream().filter(ItemUsage.class::isInstance).map(ItemUsage.class::cast).findFirst()
 						.ifPresent(iu -> {
+							for(var s : iu.getOwnedSpecialization())
+								{
+									var ft = (FeatureTyping) s;
+									System.out.println(ft);
+								}
 							var type = iu.getType().get(0);
 							if (type.libraryNamespace() != null && "AADL".equals(type.libraryNamespace().getName())) {
 								return;

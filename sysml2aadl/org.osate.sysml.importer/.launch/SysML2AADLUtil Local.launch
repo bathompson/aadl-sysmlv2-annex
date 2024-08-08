@@ -15,7 +15,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.osate.sysml2aadl.SysML2AADLUtil"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="org.osate.sysml.importer"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-a ${workspace_loc:/aadl.library}&#10;-o ${workspace_loc:/aadl}/examples/output&#10;-b http://localhost:9001&#10;-v&#10;&quot;Components Thu Nov 30&quot;"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-a ${workspace_loc:/aadl.library}&#13;&#10;-o ${workspace_loc:/aadl}/examples/output&#13;&#10;-b http://localhost:9001&#13;&#10;-v&#13;&#10;&quot;Components Thu Nov 30&quot;"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.osate.sysml.importer"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=file:/home/lwrage/git/mbe/aadl-sysml2/sysml2aadl/org.osate.sysml.importer/src/org/osate/sysml2aadl/log4j.properties"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=file:C:\Users\e40081898\Documents\osate_git\aadl-sysmlv2\sysml2aadl\org.osate.sysml.importer\src\org\osate\sysml2aadl\log4j.properties"/>
 </launchConfiguration>
